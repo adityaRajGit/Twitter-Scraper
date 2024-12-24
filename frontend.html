@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Trends Scraper</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: none;
+        }
+        .loading {
+            display: none;
+            color: #666;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #1da1f2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .trend {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Twitter Trends Scraper</h1>
+    <button id="scrapeBtn" onclick="scrapeTrends()">Scrape Trending Topics</button>
+    <p id="loading" class="loading">Scraping trends, please wait...</p>
+    
+    <div id="results" class="results">
+        <h2>Latest Trends</h2>
+        <p><strong>Scrape ID:</strong> <span id="scrapeId"></span></p>
+        <p><strong>IP Address:</strong> <span id="ipAddress"></span></p>
+        <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+        <h3>Trending Topics:</h3>
+        <div id="trends"></div>
+    </div>
+
+    <script>
+        async function scrapeTrends() {
+            const button = document.getElementById('scrapeBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            button.disabled = true;
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            
+            try {
+                const response = await axios.post('/scrape');
+                const data = response.data;
+                
+                document.getElementById('scrapeId').textContent = data.unique_id;
+                document.getElementById('ipAddress').textContent = data.ip_address;
+                document.getElementById('timestamp').textContent = new Date(data.timestamp).toLocaleString();
+                
+                const trendsDiv = document.getElementById('trends');
+                trendsDiv.innerHTML = '';
+                
+                for (let i = 1; i <= 5; i++) {
+                    const trend = data[`trend${i}`];
+                    if (trend) {
+                        const trendElement = document.createElement('div');
+                        trendElement.className = 'trend';
+                        trendElement.textContent = `${i}. ${trend}`;
+                        trendsDiv.appendChild(trendElement);
+                    }
+                }
+                
+                results.style.display = 'block';
+            } catch (error) {
+                alert('Error scraping trends: ' + error.message);
+            } finally {
+                button.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
