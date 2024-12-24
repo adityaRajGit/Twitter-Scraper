@@ -29,7 +29,6 @@ class TwitterScraper:
         return webdriver.Chrome(service=service, options=chrome_options)
 
     def login_to_twitter(self, driver):
-        """Handle Twitter login"""
         driver.get('https://twitter.com/login')
         wait = WebDriverWait(driver, 20)
         
@@ -43,7 +42,6 @@ class TwitterScraper:
         password_input.submit()
 
     def get_trending_topics(self):
-        """Scrape trending topics from Twitter"""
         driver = self.setup_driver()
         try:
             self.login_to_twitter(driver)
